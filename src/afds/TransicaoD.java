@@ -6,10 +6,20 @@ package afds;
  */
 public class TransicaoD {
 	
+        private int index;
 	private Estado origem;
 	private Estado destino;
 	private Simbolo simbolo;
 
+        
+        
+        public int getIndex() {
+            return this.index;
+        }
+        
+        public void setIndex(int index) {
+            this.index = index;
+        }
         
 	/**
 	 * Obt�m o destino da transi��o determin�stica

@@ -381,18 +381,26 @@ public class AFD {
             // Não podem haver estados inatingíveis, a partir do estado inicial
             ConjuntoEstados estadosAlcancaveis = new ConjuntoEstados();
             
-            ConjuntoTransicaoD fp, fp2;
-            TransicaoD t, t2;
-            fp = getFuncaoPrograma();
-            fp2 = fp;
-            for (Iterator iter = fp.getElementos().iterator(); iter.hasNext();) {
-                t = (TransicaoD) iter.next();
-                estadosAlcancaveis.inclui(t.getDestino());
+            ConjuntoTransicaoD conjuntoTransicao1, conjuntoTransicao2;
+            
+            // Transicoes
+            TransicaoD transicao1;
+            TransicaoD transicao2;
+            
+            
+            conjuntoTransicao1 = getFuncaoPrograma();
+            conjuntoTransicao2 = conjuntoTransicao1;
+
+            
+            for (Iterator iter = conjuntoTransicao1.getElementos().iterator(); iter.hasNext();) {
+                
+                transicao1 = (TransicaoD) iter.next();
+                estadosAlcancaveis.inclui(transicao1.getDestino());
                 
                 totalEstados++;
             }
             
-            if (this.estados != estadosAlcancaveis) {
+            if (!this.estados.igual(estadosAlcancaveis)) {
                 return false;
             }
             
@@ -401,40 +409,47 @@ public class AFD {
             
             int estadosNaoEquivalentes[][] = new int[totalEstados-1][totalEstados-1];
             
-            int i=-2, j=-1;
-            for (Iterator iter = fp.getElementos().iterator(); iter.hasNext();) {
-                i++;
-                
-                // Pula o primeiro elemento
-                if (i == -1){ continue;}
-                
-                t = (TransicaoD) iter.next();
-                for (Iterator iter2 = fp2.getElementos().iterator(); iter2.hasNext();) {
-                    j++;
-                    t2 = (TransicaoD) iter2.next();
+            /**
+            * Marcando os pares trivialmente diferentes 
+            */
+            for (Iterator iter = conjuntoTransicao1.getElementos().iterator(); iter.hasNext();) {
+               
+                transicao1 = (TransicaoD) iter.next();
+                for (Iterator iter2 = conjuntoTransicao2.getElementos().iterator(); iter2.hasNext();) {
                     
-                    if ((t.getDestino().contains(this.estadosFinais) && !t2.getDestino().contains(this.estadosFinais))
-                            || (t2.getDestino().contains(this.estadosFinais) && !t.getDestino().contains(this.estadosFinais))) {
-                        estadosNaoEquivalentes[i][j] = 1;
+                    transicao2 = (TransicaoD) iter2.next();
+                    
+                    if ((this.estadosFinais.pertence(transicao1.getDestino())) && !(this.estadosFinais.pertence(transicao2.getDestino()))
+                            || ((this.estadosFinais.pertence(transicao2.getDestino())) && !(this.estadosFinais.pertence(transicao1.getDestino())))) {
+                        estadosNaoEquivalentes[transicao1.getIndex()][transicao2.getIndex()] = 1;
+                       
                     }
+                }
+            }
+            
+            
+            /**
+             * Passo2 : 
+             **/
+            for (Iterator iter = conjuntoTransicao1.getElementos().iterator(); iter.hasNext();) {
+               
+                transicao1 = (TransicaoD) iter.next();
+                for (Iterator iter2 = conjuntoTransicao2.getElementos().iterator(); iter2.hasNext();) {
+                    
+                    transicao2 = (TransicaoD) iter2.next();
                     
                     ConjuntoSimbolo novoCsi = this.getSimbolos().clonar();
                     Simbolo s;
                     
                     for (Iterator iterSi = novoCsi.iterator(); iterSi.hasNext();) {
                         s = (Simbolo) iterSi.next();
-                        if (this.p(t.getDestino(), s) != this.p(t2.getDestino(), s)) {
+                        if (this.p(transicao1.getDestino(), s) != this.p(transicao2.getDestino(), s)) {
 
                         }
                     }
                     
-                    // Pula o ultimo elemento
-                    if (!iter2.hasNext()){continue;}
-                    
-                    
                 }
             }
-            
             
             return true;
         }

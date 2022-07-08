@@ -10,6 +10,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class ConjuntoEstados {
+    
 
 	private Set elementos = new LinkedHashSet();
 
