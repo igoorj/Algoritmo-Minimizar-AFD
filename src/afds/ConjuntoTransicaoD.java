@@ -11,8 +11,6 @@ import java.util.LinkedList;
 import java.util.Set;
 
 public class ConjuntoTransicaoD {
-    
-        int indexador = 0;
 
 	private Set elementos = new LinkedHashSet();
 
@@ -38,7 +36,6 @@ public class ConjuntoTransicaoD {
 	 * 
 	 */
 	public void limpar() {
-                this.indexador = 0;
 		elementos.clear();
 	}
 
@@ -50,8 +47,6 @@ public class ConjuntoTransicaoD {
 	 *            determin�sticas
 	 */
 	public void inclui(TransicaoD elemento) {
-                elemento.setIndex(this.indexador);
-                this.indexador++;
 		elementos.add(elemento.clonar());
 	}
 

@@ -7,6 +7,7 @@ package afds;
 
 public class Estado {
 	
+        private int index;
 	private String nome = "";
 	
 	/**
@@ -61,6 +62,14 @@ public class Estado {
 		String s = new String();		
 		s += this.getNome();
 		return s;
-	}        
+	}    
+        
+        public int getIndex() {
+            return this.index;
+        }
+        
+        public void setIndex(int index) {
+            this.index = index;
+        }
 	        
 }

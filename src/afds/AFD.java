@@ -381,18 +381,17 @@ public class AFD {
             // Não podem haver estados inatingíveis, a partir do estado inicial
             ConjuntoEstados estadosAlcancaveis = new ConjuntoEstados();
             
-            ConjuntoTransicaoD conjuntoTransicao1, conjuntoTransicao2;
+            ConjuntoTransicaoD conjuntoTransicao;
             
             // Transicoes
             TransicaoD transicao1;
             TransicaoD transicao2;
             
             
-            conjuntoTransicao1 = getFuncaoPrograma();
-            conjuntoTransicao2 = conjuntoTransicao1;
+            conjuntoTransicao = getFuncaoPrograma();
 
             
-            for (Iterator iter = conjuntoTransicao1.getElementos().iterator(); iter.hasNext();) {
+            for (Iterator iter = conjuntoTransicao.getElementos().iterator(); iter.hasNext();) {
                 
                 transicao1 = (TransicaoD) iter.next();
                 estadosAlcancaveis.inclui(transicao1.getDestino());
@@ -407,21 +406,23 @@ public class AFD {
             // A função P do AFD deve ser total
             // to-do
             
-            int estadosNaoEquivalentes[][] = new int[totalEstados-1][totalEstados-1];
+            int estadosNaoEquivalentes[][] = new int[totalEstados][totalEstados];
+            
             
             /**
             * Marcando os pares trivialmente diferentes 
             */
-            for (Iterator iter = conjuntoTransicao1.getElementos().iterator(); iter.hasNext();) {
+            for (Iterator iter = conjuntoTransicao.getElementos().iterator(); iter.hasNext();) {
                
                 transicao1 = (TransicaoD) iter.next();
-                for (Iterator iter2 = conjuntoTransicao2.getElementos().iterator(); iter2.hasNext();) {
+                
+                for (Iterator iter2 = conjuntoTransicao.getElementos().iterator(); iter2.hasNext();) {
                     
                     transicao2 = (TransicaoD) iter2.next();
                     
                     if ((this.estadosFinais.pertence(transicao1.getDestino())) && !(this.estadosFinais.pertence(transicao2.getDestino()))
                             || ((this.estadosFinais.pertence(transicao2.getDestino())) && !(this.estadosFinais.pertence(transicao1.getDestino())))) {
-                        estadosNaoEquivalentes[transicao1.getIndex()][transicao2.getIndex()] = 1;
+                        estadosNaoEquivalentes[transicao1.getDestino().getIndex()][transicao2.getDestino().getIndex()] = 1;
                        
                     }
                 }
@@ -429,24 +430,85 @@ public class AFD {
             
             
             /**
-             * Passo2 : 
+             * Marcação dos estados não-equivalentes;
              **/
-            for (Iterator iter = conjuntoTransicao1.getElementos().iterator(); iter.hasNext();) {
+            
+            Estado p1;
+            Estado p2;
+            
+            for (Iterator iter = conjuntoTransicao.getElementos().iterator(); iter.hasNext();) {
                
                 transicao1 = (TransicaoD) iter.next();
-                for (Iterator iter2 = conjuntoTransicao2.getElementos().iterator(); iter2.hasNext();) {
+                for (Iterator iter2 = conjuntoTransicao.getElementos().iterator(); iter2.hasNext();) {
                     
                     transicao2 = (TransicaoD) iter2.next();
                     
                     ConjuntoSimbolo novoCsi = this.getSimbolos().clonar();
                     Simbolo s;
+                    boolean programa = true, destinoMarcado = false;
                     
                     for (Iterator iterSi = novoCsi.iterator(); iterSi.hasNext();) {
                         s = (Simbolo) iterSi.next();
-                        if (this.p(transicao1.getDestino(), s) != this.p(transicao2.getDestino(), s)) {
-
+                        
+                        transicao2 = (TransicaoD) iter2.next();
+                        
+                        p1 = this.p(transicao1.getDestino(), s);
+                        p2 = this.p(transicao2.getDestino(), s);
+                        
+                        if (p1.igual(p2)) {
+                            programa = false;
+                            destinoMarcado = false;
+                            // Limpa a lista desse par {qu,qv}
+                            break;
+                        } else {
+                            
+                            if (estadosNaoEquivalentes[p1.getIndex()][p2.getIndex()] == 1) {
+                                destinoMarcado = true;
+                            } else {
+                                // incluir o par {qu,qv} numa lista relacionada a {pu,pv} para posterior análise;
+                            }
+                            
                         }
                     }
+                    
+                    if (programa) {
+                        if (destinoMarcado) {
+                            estadosNaoEquivalentes[transicao1.getDestino().getIndex()][transicao2.getDestino().getIndex()] = 1;
+                            /*
+                            se {qu,qv} encabeça uma lista de pares, então
+                            marcar todos os pares da lista (e recursivamente
+                            para todos os pares da lista que encabeçam uma
+                            lista};
+                            */
+                        } else {
+                            // incluir o par {qu,qv} numa lista relacionada a {pu,pv} para posterior análise;
+                        }
+                    }
+                    
+                }
+            }
+            
+            for (Iterator iter = conjuntoTransicao.getElementos().iterator(); iter.hasNext();) {
+               
+                transicao1 = (TransicaoD) iter.next();
+                for (Iterator iter2 = conjuntoTransicao.getElementos().iterator(); iter2.hasNext();) {
+                    
+                     transicao2 = (TransicaoD) iter2.next();
+                     
+                     // Verifica se são equivalentes na matriz
+                     if (estadosNaoEquivalentes[transicao1.getDestino().getIndex()][transicao2.getDestino().getIndex()] == 1) {
+                         // Pares de estados equivalentes não-finais são unificados como um estado não-final.
+                          if (this.estadosFinais.pertence(transicao1.getDestino()) && this.estadosFinais.pertence(transicao2.getDestino())) {
+                              // Unificar os estados como finais
+                          } else {
+                              // Unificar os estados como não finais
+                          }
+                          
+                          if (this.estadoInicial.igual(transicao1.getDestino()) || this.estadoInicial.igual(transicao2.getDestino())) {
+                              // Se algum estado unificado é inicial, então, o estado resultante é inicial.
+                          }
+                         
+                     }
                     
                 }
             }

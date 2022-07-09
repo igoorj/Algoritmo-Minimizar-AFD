@@ -11,7 +11,7 @@ import java.util.Set;
 
 public class ConjuntoEstados {
     
-
+        int indexador = 0;
 	private Set elementos = new LinkedHashSet();
 
 	/**
@@ -35,7 +35,8 @@ public class ConjuntoEstados {
 	 *
 	 */
 	public void limpar() {
-		elementos.clear();
+            this.indexador = 0;
+	elementos.clear();
 	}
 	
 
@@ -46,6 +47,8 @@ public class ConjuntoEstados {
 	 *            Estado a ser inserido no conjunto de estados
 	 */
 	public void inclui(Estado elemento) {
+                elemento.setIndex(this.indexador);
+                this.indexador++;
 		elementos.add(elemento.clonar());
 	}
 
