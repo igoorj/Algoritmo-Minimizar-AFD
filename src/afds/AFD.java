@@ -402,12 +402,18 @@ public class AFD {
         Estado estado1;
         Estado estado2;
         ConjuntoEstados estadosAlcancaveis = new ConjuntoEstados();
+        
+        ConjuntoTransicaoD fp = getFuncaoPrograma();
+        TransicaoD t;
 
-        for (Iterator iter = conjuntoEstados.getElementos().iterator(); iter.hasNext();) {
+        for (Iterator iter = fp.getElementos().iterator(); iter.hasNext();) {
 
-            estado1 = (Estado) iter.next();
-            if (!estadosAlcancaveis.pertence(estado1)) {
-                estadosAlcancaveis.inclui(estado1);
+            t = (TransicaoD) iter.next();
+            if (!estadosAlcancaveis.pertence(t.getOrigem())) {
+                estadosAlcancaveis.inclui(t.getOrigem());
+            }
+            if (!estadosAlcancaveis.pertence(t.getDestino())) {
+                estadosAlcancaveis.inclui(t.getDestino());
             }
 
         }
