@@ -20,6 +20,7 @@ public class Principal {
         AFD a = new AFD();
         try {
                a.ler("./test/AFD.XML");
+               a.otimizar();
                System.out.println("AFD M = "+a);
                if (a.Aceita(w))
                    System.out.println("Aceitou "+w);
