@@ -9,6 +9,7 @@ public class Simbolo {
     
 	final static public Simbolo VAZIA = new Simbolo('E');    
 	
+        private int index;
 	private char simbolo;
 	
 	/**
@@ -48,7 +49,8 @@ public class Simbolo {
 	 */
 	public Simbolo clonar() {		
 		Simbolo s = new Simbolo();		
-		s.setSimbolo(this.getSimbolo());		
+		s.setSimbolo(this.getSimbolo());	
+                s.setIndex(this.getIndex());
 		return s;		
 	}
         
@@ -63,5 +65,13 @@ public class Simbolo {
 		String s = new String();		
 		s += this.getSimbolo();
 		return s;
-	}                
+	}   
+        
+        public int getIndex() {
+            return this.index;
+        }
+        
+        protected void setIndex(int index) {
+            this.index = index;
+        }
 }

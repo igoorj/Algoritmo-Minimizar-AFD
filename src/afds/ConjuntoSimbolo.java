@@ -11,6 +11,7 @@ import java.util.Set;
 
 public class ConjuntoSimbolo {
 
+        int indexador = 0;
 	private Set elementos = new LinkedHashSet();
 
 	/**
@@ -36,6 +37,7 @@ public class ConjuntoSimbolo {
 	 */
 	public void limpar(){
 		elementos.clear();
+                this.indexador = 0;
 	}	
 
 	/**
@@ -45,6 +47,8 @@ public class ConjuntoSimbolo {
 	 *            Simbolo a ser inserido no conjunto de s�mbolos
 	 */
 	public void inclui(Simbolo elem) {
+                elem.setIndex(this.indexador);
+                this.indexador++;
 		elementos.add(elem);
 	}
 
@@ -212,6 +216,24 @@ public class ConjuntoSimbolo {
 		
 	
 	}
+        
+        public Simbolo getByIndex(int index) {
+            for (Iterator iter = elementos.iterator(); iter.hasNext();) {
+                Simbolo simbolo = (Simbolo) iter.next();
+                if (simbolo.getIndex() == index) {
+                    return simbolo;
+                }
+            }
+            return null;
+        }
+        
+        private int getIndexador() {
+            return this.indexador;
+        }
+        
+        private void setIndexador(int indexador) {
+            this.indexador = indexador;
+        }
 
 	/**
 	 * Retorna os elementos do
@@ -236,6 +258,14 @@ public class ConjuntoSimbolo {
 	 */
 	public void removerElemento(Simbolo s){
 		elementos.remove(s);
+	}
+        
+        /**
+	 * Retorna o tamanho do Conjunto
+	 * @return tamanho do conjunto
+	 */
+	public int size(){
+		return elementos.size();
 	}
 	
 

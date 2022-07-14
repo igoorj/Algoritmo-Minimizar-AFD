@@ -36,7 +36,7 @@ public class ConjuntoEstados {
 	 */
 	public void limpar() {
             this.indexador = 0;
-	elementos.clear();
+            elementos.clear();
 	}
 	
 
@@ -142,6 +142,7 @@ public class ConjuntoEstados {
 			}
 
 		}
+                novoConjunto.setIndexador(this.getIndexador());
 
 		return novoConjunto;
 	}
@@ -231,7 +232,25 @@ public class ConjuntoEstados {
 		return s;
 
 	}
+        
+        public Estado getByIndex(int index) {
+            for (Iterator iter = elementos.iterator(); iter.hasNext();) {
+                Estado estado = (Estado) iter.next();
+                if (estado.getIndex() == index) {
+                    return estado;
+                }
+            }
+            return null;
+        }
 
+        private int getIndexador() {
+            return this.indexador;
+        }
+        
+        private void setIndexador(int indexador) {
+            this.indexador = indexador;
+        }
+        
 	/**
 	 * Retorna os elementos do conjunto de
 	 * estados

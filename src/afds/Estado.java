@@ -48,7 +48,8 @@ public class Estado {
 	 */
 	public Estado clonar() {		
 		Estado e = new Estado();
-		e.setNome(this.getNome());		
+		e.setNome(this.getNome());
+                e.setIndex(this.getIndex());
 		return e;		
 	}
         
@@ -68,7 +69,7 @@ public class Estado {
             return this.index;
         }
         
-        public void setIndex(int index) {
+        protected void setIndex(int index) {
             this.index = index;
         }
 	        

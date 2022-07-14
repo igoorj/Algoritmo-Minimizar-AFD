@@ -397,14 +397,19 @@ public class AFD {
         // Não podem haver estados inatingíveis, a partir do estado inicial
         ConjuntoEstados conjuntoEstados = getEstados();
         int totalEstados = conjuntoEstados.size();
+        int totalSimbolos = simbolos.size();
 
         // Transicoes
         Estado estado1;
         Estado estado2;
+        Simbolo s;
         ConjuntoEstados estadosAlcancaveis = new ConjuntoEstados();
         
         ConjuntoTransicaoD fp = getFuncaoPrograma();
-        TransicaoD t;
+        TransicaoD transicao = new TransicaoD();
+        TransicaoD t = new TransicaoD();
+        
+        int transicoes[][] = new int[totalEstados][totalSimbolos];
 
         for (Iterator iter = fp.getElementos().iterator(); iter.hasNext();) {
 
@@ -415,6 +420,9 @@ public class AFD {
             if (!estadosAlcancaveis.pertence(t.getDestino())) {
                 estadosAlcancaveis.inclui(t.getDestino());
             }
+            
+            System.out.println(t.getDestino().getIndex());
+            transicoes[t.getDestino().getIndex()][t.getSimbolo().getIndex()] = 1;
 
         }
 
@@ -424,7 +432,34 @@ public class AFD {
         }
 
         // A função P do AFD deve ser total
-        // to-do
+        boolean inserido = false;
+        Estado estadoAux = new Estado();
+        estadoAux.setNome("AFD-TOTAL");
+        
+        for (int i=0;i<totalEstados;i++) {
+            for (int j=0;j<totalSimbolos;j++) {
+                
+                if (transicoes[i][j] == 0) {
+                    estado1 = this.estados.getByIndex(i);
+                    s = this.simbolos.getByIndex(j);
+                    
+                    if (estado1 != null && s != null) {
+                        transicao.setOrigem(estado1);
+                        transicao.setDestino(estadoAux);
+                        transicao.setSimbolo(s);
+                    }
+                    
+                    funcaoPrograma.inclui(transicao);
+                    
+                    inserido = true;
+                }
+            }
+        }
+        
+        if (inserido) {
+            estados.inclui(estadoAux);
+            totalEstados++;
+        }
         
         
         int estadosNaoEquivalentes[][] = new int[totalEstados][totalEstados];
@@ -464,7 +499,6 @@ public class AFD {
                 estado2 = (Estado) iter2.next();
 
                 ConjuntoSimbolo novoCsi = this.getSimbolos().clonar();
-                Simbolo s;
                 boolean programa = true;
 
                 for (Iterator iterSi = novoCsi.iterator(); iterSi.hasNext();) {
