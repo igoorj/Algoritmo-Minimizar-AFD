@@ -73,6 +73,26 @@ public class ConjuntoSimbolo {
 
 
 	}
+        
+        /**
+	 * Verfica se um Estado pertence a um dado conjunto de estados
+	 * se j� pertence retorna o estado que j� esta contido no conjunto
+	 * @param elemento
+	 *            Estado a ser verificado
+	 * @return Retorna o elemento pertencente ao Conjunto e igual ao parametro
+	 */
+	public Simbolo buscarPorSimbolo(char nome) {
+		
+		for (Iterator iter = elementos.iterator(); iter.hasNext();) {
+			Simbolo simbolo = (Simbolo) iter.next();
+			if (simbolo.getSimbolo() == nome) {
+				return simbolo;
+			}
+		}
+
+		return null;
+
+	}
 
 	/**
 	 * Realiza a uni�o entre dois conjuntos de simbolos

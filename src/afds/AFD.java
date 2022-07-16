@@ -251,14 +251,40 @@ public class AFD {
             throws Exception {
         TransicaoD transD = new TransicaoD();
         NodeList children = elem.getElementsByTagName(tagName);
+        
+        Estado origem;
+        Estado destino;
+        
+        Simbolo simbolo;
+        
         if (children != null) {
             for (int i = 0; i < children.getLength(); i++) {
                 Element child = (Element) children.item(i);
                 if (child != null) {
-                    transD.setOrigem(new Estado(child.getAttribute("origem")));
-                    transD.setDestino(new Estado(child.getAttribute("destino")));
+                    origem = estados.buscarPorNome(child.getAttribute("origem"));
+                    destino = estados.buscarPorNome(child.getAttribute("destino"));
+                    if (origem == null) {
+                        origem = new Estado(child.getAttribute("origem"));
+                        estados.inclui(origem);
+                    }
+                    if (destino == null) {
+                        destino = new Estado(child.getAttribute("destino"));
+                        estados.inclui(destino);
+                    }
+                    
+                    transD.setOrigem(origem);
+                    transD.setDestino(destino);
+                    
+                    
+                    
                     char[] c = child.getAttribute("simbolo").toCharArray();
-                    transD.setSimbolo(new Simbolo(c[0]));
+                    simbolo = simbolos.buscarPorSimbolo(c[0]);
+                    if (simbolo == null) {
+                        simbolo = new Simbolo(c[0]);
+                        simbolos.inclui(simbolo);
+                    }
+                    
+                    transD.setSimbolo(simbolo);
                     //int a =  Integer.parseInt(child.getAttribute("acao"));                                       
                     funcaoPrograma.inclui(transD);
                 }
@@ -407,7 +433,9 @@ public class AFD {
         
         ConjuntoTransicaoD fp = getFuncaoPrograma();
         TransicaoD transicao = new TransicaoD();
-        TransicaoD t = new TransicaoD();
+        TransicaoD t;
+        
+        ConjuntoSimbolo novoCsi = this.getSimbolos().clonar();
         
         int transicoes[][] = new int[totalEstados][totalSimbolos];
 
@@ -421,8 +449,7 @@ public class AFD {
                 estadosAlcancaveis.inclui(t.getDestino());
             }
             
-            System.out.println(t.getDestino().getIndex());
-            transicoes[t.getDestino().getIndex()][t.getSimbolo().getIndex()] = 1;
+            transicoes[t.getOrigem().getIndex()][t.getSimbolo().getIndex()] = 1;
 
         }
 
@@ -457,8 +484,17 @@ public class AFD {
         }
         
         if (inserido) {
-            estados.inclui(estadoAux);
+            this.estados.inclui(estadoAux);
             totalEstados++;
+            
+             for (Iterator iterSi = novoCsi.iterator(); iterSi.hasNext();) {
+                s = (Simbolo) iterSi.next();
+                transicao.setOrigem(estadoAux);
+                transicao.setDestino(estadoAux);
+                transicao.setSimbolo(s);
+                
+                funcaoPrograma.inclui(transicao);
+             }
         }
         
         
@@ -497,8 +533,6 @@ public class AFD {
             for (Iterator iter2 = conjuntoEstados.getElementos().iterator(); iter2.hasNext();) {
 
                 estado2 = (Estado) iter2.next();
-
-                ConjuntoSimbolo novoCsi = this.getSimbolos().clonar();
                 boolean programa = true;
 
                 for (Iterator iterSi = novoCsi.iterator(); iterSi.hasNext();) {
@@ -534,6 +568,9 @@ public class AFD {
                             conjunto.inclui(estado1);
                             conjunto.inclui(estado2);
                             // Adicionando o conjunto de estados na lista da posição
+                            if (matrizPosicoes[p1.getIndex()][p2.getIndex()] == null) {
+                                 matrizPosicoes[p1.getIndex()][p2.getIndex()] = new ConjuntoConjuntoEstados();
+                            }
                             matrizPosicoes[p1.getIndex()][p2.getIndex()].inclui(conjunto);
                             // incluir o par {qu,qv} numa lista relacionada a {pu,pv} para posterior análise;
                         }
@@ -548,7 +585,7 @@ public class AFD {
         ConjuntoEstados estadosFinais = new ConjuntoEstados();
         Estado estadoInicial = new Estado();
 
-       for (Iterator iter = conjuntoEstados.getElementos().iterator(); iter.hasNext();) {
+        for (Iterator iter = conjuntoEstados.getElementos().iterator(); iter.hasNext();) {
 
             estado1 = (Estado) iter.next();
             for (Iterator iter2 = conjuntoEstados.getElementos().iterator(); iter2.hasNext();) {
@@ -600,21 +637,33 @@ public class AFD {
     private int[][] funcaoDeMarcar(ConjuntoConjuntoEstados matrizPosicao[][], int matriz[][], int index1, int index2) {
 
         ConjuntoConjuntoEstados posicao = matrizPosicao[index1][index2];
+        if (posicao == null) { return matriz; };
+        Estado estado1;
+        Estado estado2;
 
         for (Iterator iter = posicao.getElementos().iterator(); iter.hasNext();) {
+            estado1 = null;
+            estado2 = null;
 
             // Recuperando o conjunto de estados da Posição
             ConjuntoEstados conjunto = (ConjuntoEstados) iter.next();
 
             // Recuperando todos os estados do conjunto de estados (2)
-            List<Estado> estados = new ArrayList<>();
+            
             for (Iterator iter2 = conjunto.getElementos().iterator(); iter.hasNext();) {
-                estados.add((Estado) iter2.next());
+                if (estado1 != null) {
+                    estado1 = (Estado) iter2.next();
+                }
+                if (estado2 != null) {
+                    estado2 = (Estado) iter2.next();
+                }
             }
 
             // marcando a posição na matriz
-            matriz[estados.get(0).getIndex()][estados.get(1).getIndex()] = 1;
-            matriz = funcaoDeMarcar(matrizPosicao, matriz, estados.get(0).getIndex(), estados.get(1).getIndex());
+            if (estado1 != null && estado2 != null) {
+                matriz[estado1.getIndex()][estado2.getIndex()] = 1;
+                matriz = funcaoDeMarcar(matrizPosicao, matriz, estado1.getIndex(), estado2.getIndex());
+            }
         }
         return matriz;
     }

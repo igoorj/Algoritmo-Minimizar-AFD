@@ -19,7 +19,7 @@ public class Principal {
     public void faca1(String w) {
         AFD a = new AFD();
         try {
-               a.ler("./test/AFD.XML");
+               a.ler("./test/AFD_1.XML");
                System.out.println("AFD M = "+a);
                a.otimizar();
                System.out.println("AFD M = "+a);

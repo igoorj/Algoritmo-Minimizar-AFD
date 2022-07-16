@@ -46,7 +46,7 @@ public class Estado {
 	 * Cria e retorna uma c�pia do objeto Estado
 	 * @return um clone desse Estado
 	 */
-	public Estado clonar() {		
+	public Estado clonar() {
 		Estado e = new Estado();
 		e.setNome(this.getNome());
                 e.setIndex(this.getIndex());

@@ -74,7 +74,8 @@ public class ConjuntoEstados {
 		return false;
 
 	}
-	
+        
+        
 	
 	/**
 	 * Verfica se um Estado pertence a um dado conjunto de estados
@@ -83,12 +84,11 @@ public class ConjuntoEstados {
 	 *            Estado a ser verificado
 	 * @return Retorna o elemento pertencente ao Conjunto e igual ao parametro
 	 */
-	public Estado retornaIgual(Estado elemento) {
-		if (elemento == null) return null;
+	public Estado buscarPorNome(String nome) {
 		
 		for (Iterator iter = elementos.iterator(); iter.hasNext();) {
 			Estado estado = (Estado) iter.next();
-			if (estado.igual(elemento)) {
+			if (estado.getNome().equalsIgnoreCase(nome)) {
 				return estado;
 			}
 		}
