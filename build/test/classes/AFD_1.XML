@@ -29,7 +29,7 @@
        <elemento origem="q2"  destino="q5" simbolo="b"/>
        <elemento origem="q3"  destino="q4" simbolo="b"/>
        <elemento origem="q3"  destino="q5" simbolo="a"/>
-       <elemento origem="q4"  destino="q2" simbolo="n"/>
+       <elemento origem="q4"  destino="q2" simbolo="b"/>
        <elemento origem="q4"  destino="q3" simbolo="a"/>
        <elemento origem="q5"  destino="q2" simbolo="a"/>
        <elemento origem="q5"  destino="q3" simbolo="b"/>

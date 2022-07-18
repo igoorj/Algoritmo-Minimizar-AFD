@@ -5,8 +5,10 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/C:/Users/Vinícius/Desktop/afds/src/afds/AFD.java</file>
-            <file>file:/C:/Users/Vinícius/Desktop/afds/src/afds/Estado.java</file>
-            <file>file:/C:/Users/Vinícius/Desktop/afds/src/afds/TransicaoD.java</file>
+            <file>file:/C:/Users/Vinícius/Desktop/afds/test/AFD_1.XML</file>
+            <file>file:/C:/Users/Vinícius/Desktop/afds/src/afds/ConjuntoSimbolo.java</file>
+            <file>file:/C:/Users/Vinícius/Desktop/afds/src/afds/ConjuntoEstados.java</file>
+            <file>file:/C:/Users/Vinícius/Desktop/afds/test/AFD.XML</file>
         </group>
     </open-files>
 </project-private>
