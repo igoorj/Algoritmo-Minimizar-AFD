@@ -651,6 +651,13 @@ public class AFD {
             }
         }
 
+        for (Iterator iter = this.estadosFinais.getElementos().iterator(); iter.hasNext();) {
+            estado1 = (Estado) iter.next();
+            if (estados.pertence(estado1)) {
+                estadosFinais.inclui(estado1);
+            }
+        }
+        
         this.estados = estados;
         this.estadosFinais = estadosFinais;
         this.estadoInicial = estadoInicial;
