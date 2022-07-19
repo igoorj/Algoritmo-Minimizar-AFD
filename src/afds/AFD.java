@@ -251,12 +251,12 @@ public class AFD {
             throws Exception {
         TransicaoD transD = new TransicaoD();
         NodeList children = elem.getElementsByTagName(tagName);
-        
+
         Estado origem;
         Estado destino;
-        
+
         Simbolo simbolo;
-        
+
         if (children != null) {
             for (int i = 0; i < children.getLength(); i++) {
                 Element child = (Element) children.item(i);
@@ -271,19 +271,17 @@ public class AFD {
                         destino = new Estado(child.getAttribute("destino"));
                         estados.inclui(destino);
                     }
-                    
+
                     transD.setOrigem(origem);
                     transD.setDestino(destino);
-                    
-                    
-                    
+
                     char[] c = child.getAttribute("simbolo").toCharArray();
                     simbolo = simbolos.buscarPorSimbolo(c[0]);
                     if (simbolo == null) {
                         simbolo = new Simbolo(c[0]);
                         simbolos.inclui(simbolo);
                     }
-                    
+
                     transD.setSimbolo(simbolo);
                     //int a =  Integer.parseInt(child.getAttribute("acao"));                                       
                     funcaoPrograma.inclui(transD);
@@ -430,13 +428,13 @@ public class AFD {
         Estado estado2;
         Simbolo s;
         ConjuntoEstados estadosAlcancaveis = new ConjuntoEstados();
-        
+
         ConjuntoTransicaoD fp = getFuncaoPrograma();
         TransicaoD transicao = new TransicaoD();
         TransicaoD t;
-        
+
         ConjuntoSimbolo novoCsi = this.getSimbolos().clonar();
-        
+
         int transicoes[][] = new int[totalEstados][totalSimbolos];
 
         for (Iterator iter = fp.getElementos().iterator(); iter.hasNext();) {
@@ -448,7 +446,7 @@ public class AFD {
             if (!estadosAlcancaveis.pertence(t.getDestino())) {
                 estadosAlcancaveis.inclui(t.getDestino());
             }
-            
+
             transicoes[t.getOrigem().getIndex()][t.getSimbolo().getIndex()] = 1;
 
         }
@@ -463,58 +461,58 @@ public class AFD {
         ConjuntoTransicaoD transicaoAux = new ConjuntoTransicaoD();
         Estado estadoAux = new Estado();
         estadoAux.setNome("AFD-TOTAL");
-        
-        for (int i=0;i<totalEstados;i++) {
-            for (int j=0;j<totalSimbolos;j++) {
-                
+
+        for (int i = 0; i < totalEstados; i++) {
+            for (int j = 0; j < totalSimbolos; j++) {
+
                 if (transicoes[i][j] == 0) {
                     estado1 = this.estados.getByIndex(i);
                     s = this.simbolos.getByIndex(j);
-                    
+
                     if (estado1 != null && s != null) {
                         transicao.setOrigem(estado1);
                         transicao.setDestino(estadoAux);
                         transicao.setSimbolo(s);
                     }
-                    
+
                     this.funcaoPrograma.inclui(transicao);
                     transicaoAux.inclui(transicao);
-                    
+
                     inserido = true;
                 }
             }
         }
-        
+
         if (inserido) {
             estados.inclui(estadoAux);
             totalEstados++;
-            
-             for (Iterator iterSi = novoCsi.iterator(); iterSi.hasNext();) {
+
+            for (Iterator iterSi = novoCsi.iterator(); iterSi.hasNext();) {
                 s = (Simbolo) iterSi.next();
                 transicao.setOrigem(estadoAux);
                 transicao.setDestino(estadoAux);
                 transicao.setSimbolo(s);
-                
+
                 this.funcaoPrograma.inclui(transicao);
-             }
+            }
         }
-        
+
         conjuntoEstados = getEstados();
         totalEstados = conjuntoEstados.size();
-        
+
         int estadosNaoEquivalentes[][] = new int[totalEstados][totalEstados];
         ConjuntoConjuntoEstados matrizPosicoes[][] = new ConjuntoConjuntoEstados[totalEstados][totalEstados];
-        
+
         /**
          * Marcando os pares trivialmente diferentes
          */
-        for (Iterator iter = conjuntoEstados.getElementos().iterator(); iter.hasNext();) {
-
-            estado1 = (Estado) iter.next();
-
-            for (Iterator iter2 = conjuntoEstados.getElementos().iterator(); iter2.hasNext();) {
-
-                estado2 = (Estado) iter2.next();
+        for (int i = 0; i < totalEstados; i++) {
+            for (int j = 0; j < i; j++) {
+                estado1 = this.estados.getByIndex(i);
+                estado2 = this.estados.getByIndex(j);
+                if (estado1 == null || estado2 == null) {
+                    continue;
+                }
 
                 if ((this.estadosFinais.pertence(estado1)) && !(this.estadosFinais.pertence(estado2))
                         || ((this.estadosFinais.pertence(estado2)) && !(this.estadosFinais.pertence(estado1)))) {
@@ -523,85 +521,75 @@ public class AFD {
                 }
             }
         }
-        
-        
 
         /**
          * Marcação dos estados não-equivalentes;
-             *
+         *
          */
         Estado p1;
         Estado p2;
-        
-        for (int i=0; i< totalEstados;i++) {
-            for (int j=0; j<i;j++) {
+
+        for (int i = 0; i < totalEstados; i++) {
+            for (int j = 0; j < i; j++) {
                 estado1 = this.estados.getByIndex(i);
                 estado2 = this.estados.getByIndex(j);
-                if (estado1 == null || estado2 == null) { continue; }
-                if (estadosNaoEquivalentes[estado1.getIndex()][estado2.getIndex()] == 1) { continue; }
-
-                boolean programa = true;
+                if (estado1 == null || estado2 == null) {
+                    continue;
+                }
+                if (estadosNaoEquivalentes[estado1.getIndex()][estado2.getIndex()] == 1) {
+                    continue;
+                }
 
                 for (Iterator iterSi = novoCsi.iterator(); iterSi.hasNext();) {
                     s = (Simbolo) iterSi.next();
 
-                    p1 = this.p(estado1, s);
-                    p2 = this.p(estado2, s);
+                    p1 = this.p(estado1, s.clonar());
+                    p2 = this.p(estado2, s.clonar());
 
                     if (p1.igual(p2)) {
-                        estadosNaoEquivalentes[estado1.getIndex()][estado2.getIndex()] = 0;
-                        programa = false;
-                        break;
+                        continue;
                     }
-                }
 
-                if (programa) {
+                    // Verificando se a Posição já está marcada
+                    if (estadosNaoEquivalentes[p1.getIndex()][p2.getIndex()] == 1) {
+                        estadosNaoEquivalentes[estado1.getIndex()][estado2.getIndex()] = 1;
+                        estadosNaoEquivalentes = funcaoDeMarcar(matrizPosicoes, estadosNaoEquivalentes, estado1, estado2);
 
-                    for (Iterator iterSi = novoCsi.iterator(); iterSi.hasNext();) {
-                        s = (Simbolo) iterSi.next();
-
-                        p1 = this.p(estado1, s);
-                        p2 = this.p(estado2, s);
-                        
-                        // Verificando se a Posição já está marcada
-                        if (estadosNaoEquivalentes[p1.getIndex()][p2.getIndex()] == 1) {
-                            estadosNaoEquivalentes[estado1.getIndex()][estado2.getIndex()] = 1;
-                            estadosNaoEquivalentes = funcaoDeMarcar(matrizPosicoes, estadosNaoEquivalentes, estado1, estado2);
-
-                        } else {
-                            // Criando o conjunto de estados que pertence a uma posição
-                            ConjuntoEstados conjuntoLista = new ConjuntoEstados();
-                            // Adicionando o par de estados que pertencee a um Conjunto de estados
-                            conjuntoLista.inclui(estado1);
-                            conjuntoLista.inclui(estado2);
-                            // Adicionando o conjunto de estados na lista da posição
-                            if (matrizPosicoes[p1.getIndex()][p2.getIndex()] == null) {
-                                 matrizPosicoes[p1.getIndex()][p2.getIndex()] = new ConjuntoConjuntoEstados();
-                            }
-                            matrizPosicoes[p1.getIndex()][p2.getIndex()].inclui(conjuntoLista);
-                            // incluir o par {qu,qv} numa lista relacionada a {pu,pv} para posterior análise;
+                    } else {
+                        // Criando o conjunto de estados que pertence a uma posição
+                        ConjuntoEstados conjuntoLista = new ConjuntoEstados();
+                        // Adicionando o par de estados que pertencee a um Conjunto de estados
+                        conjuntoLista.inclui(estado1.clonar());
+                        conjuntoLista.inclui(estado2.clonar());
+                        // Adicionando o conjunto de estados na lista da posição
+                        if (matrizPosicoes[p1.getIndex()][p2.getIndex()] == null) {
+                            matrizPosicoes[p1.getIndex()][p2.getIndex()] = new ConjuntoConjuntoEstados();
                         }
+                        matrizPosicoes[p1.getIndex()][p2.getIndex()].inclui(conjuntoLista);
+                        // incluir o par {qu,qv} numa lista relacionada a {pu,pv} para posterior análise;
                     }
                 }
-
             }
+
         }
-        
+
         ConjuntoEstados estados = this.estados;
         ConjuntoEstados estadosFinais = new ConjuntoEstados();
         Estado estadoInicial = new Estado();
         ConjuntoTransicaoD funcaoPrograma = new ConjuntoTransicaoD();
 
-        for (int i=0; i< totalEstados;i++) {
-            for (int j=0; j<i;j++) {
+        for (int i = 0; i < totalEstados; i++) {
+            for (int j = 0; j < i; j++) {
                 estado1 = this.estados.getByIndex(i);
                 estado2 = this.estados.getByIndex(j);
-                if (estado1 == null || estado2 == null) { continue; }
-                
+                if (estado1 == null || estado2 == null) {
+                    continue;
+                }
+
                 // Verifica se são equivalentes na matriz
                 if (estadosNaoEquivalentes[estado1.getIndex()][estado2.getIndex()] == 0) {
                     Estado novoEstado = new Estado(estado2.getNome() + estado1.getNome());
-                    
+
                     // Pares de estados equivalentes não-finais são unificados como um estado não-final.
                     if (this.estadosFinais.pertence(estado1) && this.estadosFinais.pertence(estado2)) {
                         // Unificar os estados como finais
@@ -616,31 +604,33 @@ public class AFD {
                         // Se algum estado unificado é inicial, então, o estado resultante é inicial.
                         estadoInicial = novoEstado;
                     }
-                    
+
                     if (!estados.pertence(novoEstado)) {
                         estados.inclui(novoEstado);
                     }
-                    
+
                     // Cria as trasições
                     for (Iterator iter = fp.getElementos().iterator(); iter.hasNext();) {
                         t = (TransicaoD) iter.next();
-                        if (t.getDestino().igual(estado1) || t.getOrigem().igual(estado1)) {
-                            if (t.getOrigem().igual(estado1)) {
-                                transicao.setOrigem(t.getOrigem());
-                            } else {
-                                transicao.setOrigem(novoEstado);
-                            }
-                            if (t.getDestino().igual(estado1)) {
-                                transicao.setDestino(t.getDestino());
-                            } else {
-                                 transicao.setOrigem(novoEstado);
-                            }
-                            transicao.setSimbolo(t.getSimbolo());
+                        
+                        if (t.getDestino().igual(estado1)) {
+                            transicao.setDestino(novoEstado.clonar());
+                            transicao.setOrigem(t.getOrigem().clonar());
+                            transicao.setSimbolo(t.getSimbolo().clonar());
 
                             if (!funcaoPrograma.pertence(transicao)) {
                                 funcaoPrograma.inclui(transicao);
                             }
-                            
+
+                        }
+                        if (t.getOrigem().igual(estado1)) {
+                            transicao.setOrigem(novoEstado.clonar());
+                            transicao.setDestino(t.getDestino().clonar());
+                            transicao.setSimbolo(t.getSimbolo().clonar());
+
+                            if (!funcaoPrograma.pertence(transicao)) {
+                                funcaoPrograma.inclui(transicao);
+                            }
                         }
                     }
                     if (estados.pertence(estado1)) {
@@ -652,8 +642,7 @@ public class AFD {
                 }
             }
         }
-        
-        
+
         estados.removerElemento(estadoAux);
         for (Iterator iter = this.funcaoPrograma.getElementos().iterator(); iter.hasNext();) {
             t = (TransicaoD) iter.next();
@@ -661,12 +650,12 @@ public class AFD {
                 funcaoPrograma.inclui(t);
             }
         }
-        
+
         this.estados = estados;
         this.estadosFinais = estadosFinais;
         this.estadoInicial = estadoInicial;
         this.funcaoPrograma = funcaoPrograma;
-        
+
         return true;
     }
 
@@ -675,10 +664,12 @@ public class AFD {
 
         int index1 = estado1.getIndex();
         int index2 = estado2.getIndex();
-        
+
         ConjuntoConjuntoEstados posicao = matrizPosicao[index1][index2];
-        if (posicao == null) { return matriz; }
-        
+        if (posicao == null) {
+            return matriz;
+        }
+
         for (Iterator iter = posicao.getElementos().iterator(); iter.hasNext();) {
             estado1 = null;
             estado2 = null;
