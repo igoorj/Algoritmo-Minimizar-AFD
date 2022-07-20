@@ -435,8 +435,15 @@ public class AFD {
 
         ConjuntoSimbolo novoCsi = this.getSimbolos().clonar();
 
+        /**
+         * Matriz que vai auxiliar na descoberta de possíveis estados inatingíveis
+         */
         int transicoes[][] = new int[totalEstados][totalSimbolos];
 
+        /***
+         * Percorrendo o conjunto de transações do AFD. É comparado se um determinado estado é alcançavel 
+         * por qual Simbolo. É marcado com 1, a posição Estado X Simbolo que o torna atingível
+         */
         for (Iterator iter = fp.getElementos().iterator(); iter.hasNext();) {
 
             t = (TransicaoD) iter.next();
@@ -462,19 +469,24 @@ public class AFD {
         Estado estadoAux = new Estado();
         estadoAux.setNome("AFD-TOTAL");
 
+        // Percorrendo a matriz que identifica os estados alcançaveis
         for (int i = 0; i < totalEstados; i++) {
             for (int j = 0; j < totalSimbolos; j++) {
 
+                // situação onde o estado não possui transição com o determinado Simbolo
                 if (transicoes[i][j] == 0) {
                     estado1 = this.estados.getByIndex(i);
                     s = this.simbolos.getByIndex(j);
 
+                    // Se o estado for nulo na matriz e o simbolo também for, não há uma transição correspondente
+                    // Criamos então uma transição nova deste estado com o símbolo
                     if (estado1 != null && s != null) {
                         transicao.setOrigem(estado1);
                         transicao.setDestino(estadoAux);
                         transicao.setSimbolo(s);
                     }
 
+                    // Adiciona ao conjunto de transições do AFD e marca como inserido
                     this.funcaoPrograma.inclui(transicao);
                     transicaoAux.inclui(transicao);
 
@@ -483,11 +495,17 @@ public class AFD {
             }
         }
 
+        /*
+        * Após inserido, incluimos o novo estado auxiliar criado na lista de estados do AFD
+        *
+        * Este estado ajuda a tornar os outros estados com transições completas
+        */
         if (inserido) {
             estados.inclui(estadoAux);
             totalEstados++;
 
             for (Iterator iterSi = novoCsi.iterator(); iterSi.hasNext();) {
+                // tornando o estado auxiliar completo
                 s = (Simbolo) iterSi.next();
                 transicao.setOrigem(estadoAux);
                 transicao.setDestino(estadoAux);
@@ -500,7 +518,13 @@ public class AFD {
         conjuntoEstados = getEstados();
         totalEstados = conjuntoEstados.size();
 
+        /*Matriz que vai auxiliar na marcação dos estados não equivalentes*/
         int estadosNaoEquivalentes[][] = new int[totalEstados][totalEstados];
+        
+        /*
+        * Matriz principal que representa a tabela de cruzamento entre os estados que vai permitir
+        * percorrer os estados e assim marcar os não equivalentes
+        */
         ConjuntoConjuntoEstados matrizPosicoes[][] = new ConjuntoConjuntoEstados[totalEstados][totalEstados];
 
         /**
@@ -514,6 +538,9 @@ public class AFD {
                     continue;
                 }
 
+                /** Tendo a lista de estados finais, em um par de estados(Posição) da matriz, 
+                 * um precisa ser final e o outro não para serem trivialmente não equivalentes
+                 */
                 if ((this.estadosFinais.pertence(estado1)) && !(this.estadosFinais.pertence(estado2))
                         || ((this.estadosFinais.pertence(estado2)) && !(this.estadosFinais.pertence(estado1)))) {
                     estadosNaoEquivalentes[estado1.getIndex()][estado2.getIndex()] = 1;
@@ -575,7 +602,7 @@ public class AFD {
 
         ConjuntoEstados estados = this.estados;
         ConjuntoEstados estadosFinais = new ConjuntoEstados();
-        Estado estadoInicial = new Estado();
+        Estado estadoInicial = this.estadoInicial;
         ConjuntoTransicaoD funcaoPrograma = new ConjuntoTransicaoD();
 
         for (int i = 0; i < totalEstados; i++) {
